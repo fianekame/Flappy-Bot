@@ -1,4 +1,5 @@
 # Beberpa File Yang Ada Pada Folder Ini Dapat Diunduh Melalui - Tautan
 
-initial_data/*.npy
+initial_data/DataY.npy
+initial_data/DataX.npy
 logs_bird/*.png
