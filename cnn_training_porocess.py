@@ -33,7 +33,7 @@ def conv_net(x, weights, biases):
 
 """ Inisialisasi """
 
-training_iters = 200
+training_iters = 50
 learning_rate = 0.0001
 batch_size = 128
 n_input = 80
