@@ -84,7 +84,7 @@ with tf.Session() as sess:
     test_loss = []
     train_accuracy = []
     test_accuracy = []
-    summary_writer = tf.summary.FileWriter('./Output', sess.graph)
+    summary_writer = tf.summary.FileWriter('./summary_output', sess.graph)
     saver = tf.train.Saver(max_to_keep=1)
     for i in range(training_iters):
         for batch in range(len(train_X)//batch_size):
@@ -103,6 +103,5 @@ with tf.Session() as sess:
         train_accuracy.append(acc)
         test_accuracy.append(test_acc)
         print("Testing Accuracy:","{:.5f}".format(test_acc))
-
     saver.save(sess,'saved_networks/savedmodel.ckpt')
     summary_writer.close()
