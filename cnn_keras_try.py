@@ -13,8 +13,8 @@ _ROOTPATH = "/home/galgadot/Documents/Skripsi/FlappyBot/"
 
 """ Initializing Data """
 
-data_x = np.load(_ROOTPATH+'initial_data/DataX.npy')
-data_y = np.load(_ROOTPATH+'initial_data/DataY.npy')
+data_x = np.load('initial_data/DataX.npy')
+data_y = np.load('initial_data/DataY.npy')
 
 train_x , test_x = data_x[:500], data_x[500:600]
 train_x.shape, test_x.shape
@@ -33,7 +33,7 @@ train_x,valid_x,train_label,valid_label = train_test_split(train_x, train_y, tes
 train_x.shape,valid_x.shape,train_label.shape,valid_label.shape
 
 batch_size = 64
-epochs = 50
+epochs = 100
 num_classes = 2
 
 flappy_model = Sequential()
@@ -61,12 +61,12 @@ flappy_model.add(Dense(num_classes, activation='softmax'))
 flappy_model.summary()
 
 flappy_model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(),metrics=['accuracy'])
-flappy_train = flappy_model.fit(train_x, train_label, batch_size=batch_size,epochs=epochs,verbose=1,validation_data=(valid_X, valid_label))
+flappy_train = flappy_model.fit(train_x, train_label, batch_size=batch_size,epochs=epochs,verbose=1,validation_data=(valid_x, valid_label))
 
 # serialize model to JSON
-model_json = model.to_json()
-with open("model.json", "w") as json_file:
+model_json = flappy_model.to_json()
+with open("saved_networks/saved_model.json", "w") as json_file:
     json_file.write(model_json)
 # serialize weights to HDF5
-model.save_weights("model.h5")
+flappy_model.save_weights("saved_networks/saved_model.h5")
 print("Saved model to disk")
