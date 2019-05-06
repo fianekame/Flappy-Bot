@@ -13,8 +13,8 @@ _ROOTPATH = "/home/galgadot/Documents/Skripsi/FlappyBot/"
 
 """ Initializing Data """
 
-data_x = np.load('initial_data/DataX.npy')
-data_y = np.load('initial_data/DataY.npy')
+data_x = np.load(_ROOTPATH+'initial_data/DataX.npy')
+data_y = np.load(_ROOTPATH+'initial_data/DataY.npy')
 
 train_x , test_x = data_x[:500], data_x[500:600]
 train_x.shape, test_x.shape
@@ -25,6 +25,7 @@ train_x = train_x.astype('float32')
 test_x = test_x.astype('float32')
 train_x = train_x / 255.
 test_x = test_x / 255.
+
 
 """ ================= """
 
