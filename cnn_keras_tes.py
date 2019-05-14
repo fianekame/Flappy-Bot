@@ -14,12 +14,12 @@ _ROOTPATH = "/home/galgadot/Documents/Skripsi/FlappyBot/"
 
 """ Initializing Data """
 
-data_x = np.load(_ROOTPATH+'initial_data/DataX.npy')
-data_y = np.load(_ROOTPATH+'initial_data/DataY.npy')
+data_x = np.load('initial_data/DataX.npy')
+data_y = np.load('initial_data/DataY.npy')
 
-train_x , test_x = data_x[:500], data_x[500:501]
+train_x , test_x = data_x[:500], data_x[500:600]
 train_x.shape, test_x.shape
-train_y , test_y = data_y[:500], data_y[500:501]
+train_y , test_y = data_y[:500], data_y[500:600]
 train_y.shape, test_y.shape
 train_x = train_x.astype('float32')
 test_x = test_x.astype('float32')
@@ -34,12 +34,12 @@ epochs = 100
 num_classes = 2
 
 # load json and create model
-json_file = open(_ROOTPATH+'saved_networks/saved_model.json', 'r')
+json_file = open('saved_networks/saved_model.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 loaded_model = model_from_json(loaded_model_json)
 # load weights into new model
-loaded_model.load_weights(_ROOTPATH+"saved_networks/saved_model.h5")
+loaded_model.load_weights("saved_networks/saved_model.h5")
 print("Loaded model from disk")
 
 loaded_model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(),metrics=['accuracy'])
@@ -58,13 +58,16 @@ test_yt = np.argmax(np.round(test_y),axis=1)
 test_yt
 correct = np.where(predicted_classes==test_yt)[0]
 correct
-for i, correct in enumerate(correct[:9]):
-    print(i)
-    plt.subplot(3,3,i+1)
-    plt.imshow(test_x[correct], cmap='gray', interpolation='none')
-    plt.title("Predicted {}, Class {}".format(predicted_classes[correct], test_yt[correct]))
-    plt.tight_layout()
-plt.show()
+
+print(predicted_classes)
+print(test_yt)
+# for i, correct in enumerate(correct[:9]):
+#     print(i)
+#     plt.subplot(3,3,i+1)
+#     plt.imshow(test_x[correct], cmap='gray', interpolation='none')
+#     plt.title("Predicted {}, Class {}".format(predicted_classes[correct], test_yt[correct]))
+#     plt.tight_layout()
+# plt.show()
 # predicted_classes = np.argmax(np.round(predicted_classes),axis=1)
 # correct = np.where(predicted_classes==test_y)[0]
 # afteronehot = []

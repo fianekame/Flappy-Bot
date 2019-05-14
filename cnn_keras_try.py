@@ -34,7 +34,7 @@ train_x,valid_x,train_label,valid_label = train_test_split(train_x, train_y, tes
 train_x.shape,valid_x.shape,train_label.shape,valid_label.shape
 
 batch_size = 64
-epochs = 20
+epochs = 200
 num_classes = 2
 
 flappy_model = Sequential()
