@@ -12,13 +12,7 @@ test_y = data_y[600:700]
 # # saver = tf.train.Saver()
 # sess = tf.Session()
 #
-model_path = "saved_networks/savedmodel.ckpt"
-# # inference_graph = tf.Graph()
-# # inference_graph = tf.get_default_graph()
-#
-# output = inference_graph.get_tensor_by_name("output:0")
-# x = inference_graph.get_tensor_by_name("x:0")
-#
+model_path = "saved_networks/mymodel.ckpt"
 with tf.Session() as sess:
     loader = tf.train.import_meta_graph(model_path+".meta")
     loader.restore(sess,model_path)

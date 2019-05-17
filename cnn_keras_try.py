@@ -22,9 +22,9 @@ train_y = data_y
 # train_y.shape, test_y.shape
 
 train_x = train_x.astype('float32')
-# test_x = test_x.astype('float32')
+test_x = test_x.astype('float32')
 train_x = train_x / 255.
-# test_x = test_x / 255.
+test_x = test_x / 255.
 
 
 """ ================= """
