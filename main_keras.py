@@ -123,16 +123,6 @@ def buildmodel():
 
 def playGame():
     sess = tf.InteractiveSession()
-    # json_file = open('saved_networks/model.json', 'r')
-    # loaded_model_json = json_file.read()
-    # json_file.close()
-    # loaded_model = model_from_json(loaded_model_json)
-    # # load weights into new model
-    # loaded_model.load_weights("saved_networks/model.h5")
-    # print("Loaded model from disk")
-    # model.load_weights("saved_networks/model.h5")
-    # adam = Adam(lr=LEARNING_RATE)
-    # model.compile(loss='mse',optimizer=adam)
     model = buildmodel()
     print ("Now we load weight")
     model.load_weights("saved_networks/model.h5")
