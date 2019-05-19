@@ -54,9 +54,9 @@ def playNetwork(model, sess):
     x_t = skimage.exposure.rescale_intensity(x_t,out_range=(0,255))
 
     ret, x_t2 = cv2.threshold(x_t,1,255,cv2.THRESH_BINARY)
-    x_t = x_t / 255.0
     x_t2 = x_t2 / 255.0
     s_t2 = np.stack((x_t2, x_t2, x_t2, x_t2), axis=2)
+    x_t = x_t / 255.0
     s_t = np.stack((x_t, x_t, x_t, x_t), axis=2)
     #print (s_t.shape)
 
