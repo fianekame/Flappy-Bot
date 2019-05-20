@@ -61,16 +61,3 @@ correct
 
 print(predicted_classes)
 print(test_yt)
-# for i, correct in enumerate(correct[:9]):
-#     print(i)
-#     plt.subplot(3,3,i+1)
-#     plt.imshow(test_x[correct], cmap='gray', interpolation='none')
-#     plt.title("Predicted {}, Class {}".format(predicted_classes[correct], test_yt[correct]))
-#     plt.tight_layout()
-# plt.show()
-# predicted_classes = np.argmax(np.round(predicted_classes),axis=1)
-# correct = np.where(predicted_classes==test_y)[0]
-# afteronehot = []
-# for i in range (len(test_y)):
-#     print("Real Data : ", onehot_to_int(test_y[i]))
-#     print("Predicted Data : ", onehot_to_int(predicted_classes[i]))
