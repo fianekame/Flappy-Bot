@@ -3,4 +3,4 @@
 initial_data/
 summary_output/
 logs_bird/*.png
-models/
+models/*/
