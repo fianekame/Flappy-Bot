@@ -1,6 +1,6 @@
-
+# 1248173607
 import sys
-sys.path.append("game/")
+sys.path.append("utils/game/")
 import wrapped_flappy_bird as game
 import tensorflow as tf
 import skimage as skimage
@@ -13,6 +13,7 @@ from keras.optimizers import SGD , Adam
 from skimage import transform, color, exposure
 from skimage.transform import rotate
 from skimage.viewer import ImageViewer
+from skimage.io import imsave, imread, imshow
 
 _ROOTPATH = "/home/galgadot/Documents/Skripsi/FlappyBot/"
 FINAL_EPSILON = 0.0001 # final value of epsilon
@@ -36,23 +37,25 @@ def playNetwork(model, sess):
 
     t = 0
     epsilon = FINAL_EPSILON
-    for i in range(0,1000):
+    for i in range(0,5000):
     # while (True):
-        loss = 0
-        Q_sa = 0
         r_t = 0
         action_index = 0
         a_t = np.zeros([ACTIONS])
         if t % FRAME_PER_ACTION == 0:
-            if random.random() <= epsilon:
-                print("----------Random Action----------")
-                action_index = random.randrange(ACTIONS)
-                a_t[action_index] = 1
-            else:
-                q = model.predict(s_t)
-                max_Q = np.argmax(q)
-                action_index = max_Q
-                a_t[max_Q] = 1
+            q = model.predict(s_t)
+            max_Q = np.argmax(q)
+
+            action_index = max_Q
+            a_t[max_Q] = 1
+
+            # myrand = random.random();
+            # print(myrand)
+            # if myrand <= epsilon:
+            #     print("----------Random Action----------")
+            #     action_index = random.randrange(ACTIONS)
+            #     a_t[action_index] = 1
+            # else:
 
         #run the selected action and observed next state and reward
         x_t1_colored, r_t, terminal = game_state.frame_step(a_t)
@@ -62,7 +65,6 @@ def playNetwork(model, sess):
         x_t1 = x_t1 / 255.0
         x_t1 = x_t1.reshape(1, x_t1.shape[0], x_t1.shape[1], 1) #1x80x80x1
         s_t1 = np.append(x_t1, s_t[:, :, :, :3], axis=3)
-
         s_t = s_t1
         t = t + 1
 

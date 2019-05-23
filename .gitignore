@@ -1,6 +1,6 @@
 # Beberpa File Yang Ada Pada Folder Ini Dapat Diunduh Melalui - Tautan
 
-initial_data/DataY.npy
-initial_data/DataX.npy
+initial_data/
 summary_output/
 logs_bird/*.png
+models/
