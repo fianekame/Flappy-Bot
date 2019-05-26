@@ -1,49 +1,36 @@
 import numpy as np
 
 import keras
-from keras.models import Sequential,Input,Model
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers.normalization import BatchNormalization
-from keras.layers.advanced_activations import LeakyReLU
 from keras.models import model_from_json
-from sklearn.model_selection import train_test_split
+from keras.optimizers import Adam
 from matplotlib import pyplot as plt
+from keras.utils import to_categorical
 
 _ROOTPATH = "/home/galgadot/Documents/Skripsi/FlappyBot/"
 
-""" Initializing Data """
+def loadModel():
+    json_file = open(_ROOTPATH+'saved_networks/saved_model.json', 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    loaded_model = model_from_json(loaded_model_json)
+    loaded_model.load_weights(_ROOTPATH+"saved_networks/saved_model.h5")
+    adam = Adam(lr=1e-4)
+    loaded_model.compile(loss='mse',optimizer=adam)
+    print("Loaded model from disk")
+    return loaded_model
 
-data_x = np.load('initial_data/DataX.npy')
-data_y = np.load('initial_data/DataY.npy')
+def getData(dataSize):
+    foldername = "Data "+str(dataSize)
+    data_x = np.load(_ROOTPATH+'initial_data/'+foldername+'/DataX.npy')
+    data_y = np.load(_ROOTPATH+'initial_data/'+foldername+'/DataY.npy')
+    print(data_x.shape," - ",data_y.shape)
+    return data_x, data_y
 
-train_x , test_x = data_x[:500], data_x[500:600]
-train_x.shape, test_x.shape
-train_y , test_y = data_y[:500], data_y[500:600]
-train_y.shape, test_y.shape
-train_x = train_x.astype('float32')
-test_x = test_x.astype('float32')
-train_x = train_x / 255.
-test_x = test_x / 255.
-test_y
-# np.reshape(test_x[0], (80, 80, 1))
-
-""" ================= """
-batch_size = 64
-epochs = 100
-num_classes = 2
-
-# load json and create model
-json_file = open('saved_networks/saved_model.json', 'r')
-loaded_model_json = json_file.read()
-json_file.close()
-loaded_model = model_from_json(loaded_model_json)
-# load weights into new model
-loaded_model.load_weights("saved_networks/saved_model.h5")
-print("Loaded model from disk")
-
-loaded_model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(),metrics=['accuracy'])
-test_eval = loaded_model.evaluate(test_x, test_y, verbose=1)
+myModel = loadModel()
+data , target = getData(500)
+newTarget = to_categorical(target).tolist()
+newTarget[0]
+test_eval = myModel.evaluate(data[0], newTarget[0], verbose=1)
 print('Test loss:', test_eval[0])
 print('Test accuracy:', test_eval[1])
 
