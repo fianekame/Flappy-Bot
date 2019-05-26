@@ -31,8 +31,6 @@ def playNetwork(model, sess):
     stack_img = np.stack((img, img, img, img), axis=2)
     stack_img = stack_img.reshape(1, stack_img.shape[0], stack_img.shape[1], stack_img.shape[2])  #1*80*80*4
 
-    datax = []
-    datay = []
     frame = 0
     for i in range(0,500):
     # while (True):
@@ -59,8 +57,6 @@ def playNetwork(model, sess):
 
         print("Frame", frame,"/ Action", action_index, "/ Reward", reward)
     print("Saving Small File")
-    np.save("xDatas", datax)
-    np.save("yDatas", datay)
     print("End")
 
 def loadModel():

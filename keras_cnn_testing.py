@@ -27,24 +27,18 @@ def getData(dataSize):
     return data_x, data_y
 
 myModel = loadModel()
-data , target = getData(500)
-newTarget = to_categorical(target).tolist()
-newTarget[0]
-test_eval = myModel.evaluate(data[0], newTarget[0], verbose=1)
-print('Test loss:', test_eval[0])
-print('Test accuracy:', test_eval[1])
+data , target = getData(1000)
+target = to_categorical(target)
+target.shape
 
-def onehot_to_int(v):
-    print(v)
-    # return v.tolist().index(1.0)
-
-predicted_classes = loaded_model.predict(test_x)
+predicted_classes = myModel.predict(data)
 predicted_classes = np.argmax(np.round(predicted_classes),axis=1)
-predicted_classes
-test_yt = np.argmax(np.round(test_y),axis=1)
-test_yt
+predicted_classes.shape
+test_yt = np.argmax(np.round(target),axis=1)
 correct = np.where(predicted_classes==test_yt)[0]
-correct
+len(correct)
 
-print(predicted_classes)
-print(test_yt)
+from sklearn.metrics import classification_report
+target_names = ["Class {}".format(i) for i in range(2)]
+target_names
+print(classification_report(test_yt, predicted_classes, target_names=target_names))
