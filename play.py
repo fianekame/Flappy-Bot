@@ -31,6 +31,8 @@ def playNetwork(model, sess):
     stack_img = np.stack((img, img, img, img), axis=2)
     stack_img = stack_img.reshape(1, stack_img.shape[0], stack_img.shape[1], stack_img.shape[2])  #1*80*80*4
 
+    datax = []
+    datay = []
     frame = 0
     for i in range(0,500):
     # while (True):
@@ -41,6 +43,10 @@ def playNetwork(model, sess):
         result = np.argmax(predict)
         action_index = result
         action[result] = 1
+
+        datax.append(stack_img)
+        datay.append(action_index)
+
         img, reward = game_state.frame_step(action)
         img = skimage.color.rgb2gray(img)
         img = skimage.transform.resize(img,(80,80))
@@ -52,7 +58,9 @@ def playNetwork(model, sess):
         frame = frame + 1
 
         print("Frame", frame,"/ Action", action_index, "/ Reward", reward)
-
+    print("Saving Small File")
+    np.save("xDatas", datax)
+    np.save("yDatas", datay)
     print("End")
 
 def loadModel():
