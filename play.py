@@ -16,7 +16,7 @@ from skimage.viewer import ImageViewer
 from skimage.io import imsave, imread, imshow
 
 _ROOTPATH = "/home/galgadot/Documents/Skripsi/FlappyBot/"
-ACTIONS = 2 # number of valid actions
+ACTIONS = 2
 
 
 def playNetwork(model, sess):
@@ -41,14 +41,12 @@ def playNetwork(model, sess):
         result = np.argmax(predict)
         action_index = result
         action[result] = 1
-
-        #run the selected action and observed next state and reward
         img, reward = game_state.frame_step(action)
         img = skimage.color.rgb2gray(img)
         img = skimage.transform.resize(img,(80,80))
         img = skimage.exposure.rescale_intensity(img, out_range=(0, 255))
         img = img / 255.0
-        img = img.reshape(1, img.shape[0], img.shape[1], 1) #1x80x80x1
+        img = img.reshape(1, img.shape[0], img.shape[1], 1)
         stack = np.append(img, stack_img[:, :, :, :3], axis=3)
         stack_img = stack
         frame = frame + 1
@@ -56,23 +54,21 @@ def playNetwork(model, sess):
         print("Frame", frame,"/ Action", action_index, "/ Reward", reward)
 
     print("End")
-    print("************************")
 
-
-def playGame():
-    sess = tf.InteractiveSession()
-
-    # load json and create model
+def loadModel():
     json_file = open('saved_networks/saved_model.json', 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     loaded_model = model_from_json(loaded_model_json)
-    # load weights into new model
     loaded_model.load_weights("saved_networks/saved_model.h5")
     adam = Adam(lr=1e-4)
     loaded_model.compile(loss='mse',optimizer=adam)
     print("Loaded model from disk")
-    playNetwork(loaded_model,sess)
+    return loaded_model
+
+def playGame():
+    sess = tf.InteractiveSession()
+    playNetwork(loadModel(),sess)
 
 def main():
     playGame()
