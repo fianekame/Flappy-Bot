@@ -1,9 +1,10 @@
 import numpy as np
-
 import keras
 from keras.models import model_from_json
 from keras.optimizers import Adam
 from matplotlib import pyplot as plt
+%matplotlib inline
+import random
 from keras.utils import to_categorical
 
 _ROOTPATH = "/home/galgadot/Documents/Skripsi/FlappyBot/"
@@ -27,16 +28,38 @@ def getData(dataSize):
     return data_x, data_y
 
 myModel = loadModel()
+myModel.summary()
 data , target = getData(1000)
+target
 target = to_categorical(target)
 target.shape
+target
 
 predicted_classes = myModel.predict(data)
 predicted_classes = np.argmax(np.round(predicted_classes),axis=1)
 predicted_classes.shape
 test_yt = np.argmax(np.round(target),axis=1)
+predicted_classes
+
+""" Data Benar """
 correct = np.where(predicted_classes==test_yt)[0]
-len(correct)
+print ("Total %d Benar" % len(correct))
+for i, correct in enumerate(correct[:9]):
+    plt.subplot(3,3,i+1)
+    plt.imshow(data[correct], cmap='gray', interpolation='none')
+    plt.title("Predicted {}, Class {}".format(predicted_classes[correct], test_yt[correct]))
+    plt.tight_layout()
+
+""" Salah Tebak """
+incorrect = np.where(predicted_classes!=test_yt)[0]
+incorrect
+print ("Total %d Salah" % len(incorrect))
+for i, incorrect in enumerate(incorrect[:9]):
+    plt.subplot(3,3,i+1)
+    plt.imshow(data[incorrect], cmap='gray', interpolation='none')
+    plt.title("Predicted {}, Class {}".format(predicted_classes[incorrect], test_yt[incorrect]))
+    plt.tight_layout()
+
 
 from sklearn.metrics import classification_report
 target_names = ["Class {}".format(i) for i in range(2)]
