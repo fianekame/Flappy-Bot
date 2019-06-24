@@ -52,7 +52,6 @@ for i, correct in enumerate(correct[:9]):
 
 """ Salah Tebak """
 incorrect = np.where(predicted_classes!=test_yt)[0]
-incorrect
 print ("Total %d Salah" % len(incorrect))
 for i, incorrect in enumerate(incorrect[:9]):
     plt.subplot(3,3,i+1)
