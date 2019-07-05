@@ -12,8 +12,10 @@ SCREENWIDTH  = 288
 SCREENHEIGHT = 512
 
 pygame.init()
+pygame.font.init()
 FPSCLOCK = pygame.time.Clock()
 SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+FONTTEXT = pygame.font.SysFont('Comic Sans MS', 20)
 pygame.display.set_caption('Flappy Bot | CNN')
 
 IMAGES, SOUNDS, HITMASKS = flappy_bird_utils.load()
@@ -36,7 +38,6 @@ class GameState:
         self.playery = int((SCREENHEIGHT - PLAYER_HEIGHT) / 2)
         self.basex = 0
         self.baseShift = IMAGES['base'].get_width() - BACKGROUND_WIDTH
-
         newPipe1 = getRandomPipe()
         newPipe2 = getRandomPipe()
         self.upperPipes = [
@@ -56,9 +57,12 @@ class GameState:
         self.playerAccY    =   1   # players downward accleration
         self.playerFlapAcc =  -9   # players speed on flapping
         self.playerFlapped = False # True when player flaps
+        self.playerRot     =  45   # player's rotation
+        self.playerVelRot  =   3   # angular speed
+        self.playerRotThr  =  20   # rotation threshold
 
     def showWelcomeAnimation(self):
-        print("masukwelcome")
+        #print("masukwelcome")
         """Shows welcome screen animation of flappy bird"""
         # index of player to blit on screen
         playerIndex = 0
@@ -108,13 +112,13 @@ class GameState:
 
     def frame_step(self, input_actions):
         pygame.event.pump()
-        reward = 0.1
+        reward = 0
+        crashinfo = {}
         terminal = False
         # input_actions[0] == 1: do nothing
         # input_actions[1] == 1: flap the bird
         if sum(input_actions) != 1:
             raise ValueError('Multiple input actions!')
-
 
         if input_actions[1] == 1:
             if self.playery > -2 * PLAYER_HEIGHT:
@@ -166,9 +170,19 @@ class GameState:
         isCrash= checkCrash({'x': self.playerx, 'y': self.playery,
                              'index': self.playerIndex},
                             self.upperPipes, self.lowerPipes)
-        if isCrash:
+        if isCrash[0]:
             #SOUNDS['hit'].play()
             #SOUNDS['die'].play()
+            crashinfo = {
+                'y': self.playery,
+                'groundCrash': isCrash[1],
+                'basex': self.basex,
+                'upperPipes': self.upperPipes,
+                'lowerPipes': self.lowerPipes,
+                'score': self.score,
+                'playerVelY': self.playerVelY,
+                'playerRot': self.playerRot
+            }
             terminal = True
             self.__init__()
             reward = -1
@@ -192,7 +206,74 @@ class GameState:
         # print ("FPS" , FPSCLOCK.get_fps())
         FPSCLOCK.tick(FPS)
         # print (self.upperPipes[0]['y'] + PIPE_HEIGHT - int(BASEY * 0.2))
-        return image_data, reward
+        return image_data, reward, crashinfo
+
+    def showGameOverScreen(self, crashInfo):
+        #print("gameover")
+        """crashes the player down ans shows gameover image"""
+        score = crashInfo['score']
+        playerx = SCREENWIDTH * 0.2
+        playery = crashInfo['y']
+        playerHeight = IMAGES['player'][0].get_height()
+        playerVelY = crashInfo['playerVelY']
+        playerAccY = 2
+        playerRot = crashInfo['playerRot']
+        playerVelRot = 7
+        basex = crashInfo['basex']
+        timetake = crashInfo['timetake']
+
+        upperPipes, lowerPipes = crashInfo['upperPipes'], crashInfo['lowerPipes']
+        # play hit and die sounds
+        # SOUNDS['hit'].play()
+        # if not crashInfo['groundCrash']:
+        #     SOUNDS['die'].play()
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                    pygame.quit()
+                    sys.exit()
+                if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+                    if playery + playerHeight >= BASEY - 1:
+                        return True
+
+            # player y shift
+            if playery + playerHeight < BASEY - 1:
+                playery += min(playerVelY, BASEY - playery - playerHeight)
+
+            # player velocity change
+            if playerVelY < 15:
+                playerVelY += playerAccY
+
+            # rotate only when it's a pipe crash
+            if not crashInfo['groundCrash']:
+                if playerRot > -90:
+                    playerRot -= playerVelRot
+
+            # draw sprites
+            SCREEN.blit(IMAGES['background'], (0,0))
+
+            for uPipe, lPipe in zip(upperPipes, lowerPipes):
+                SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
+                SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
+
+            SCREEN.blit(IMAGES['base'], (basex, BASEY))
+            showScore(score)
+            playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot)
+            SCREEN.blit(playerSurface, (playerx,playery))
+            SCREEN.blit(IMAGES['gameover'], (55, 180))
+
+            textToScreen(SCREEN, 'LAMA BERMAIN : '+timetake , 70, 230, 20, (255, 255, 255))
+            # playtime = myfont.render('LAMA BERMAIN : '+timetake, True, (255, 255, 255))
+            # SCREEN.blit(playtime,(70,230))
+            FPSCLOCK.tick(FPS)
+            pygame.display.update()
+
+
+def textToScreen(screen, text, x, y, size = 18, color = (200, 000, 000)):
+    text = str(text)
+    text = FONTTEXT.render(text, True, color)
+    screen.blit(text, (x, y))
 
 
 def playerShm(playerShm):
@@ -243,7 +324,7 @@ def checkCrash(player, upperPipes, lowerPipes):
 
     # if player crashes into ground
     if player['y'] + player['h'] >= BASEY - 1:
-        return True
+        return [True,True]
     else:
 
         playerRect = pygame.Rect(player['x'], player['y'],
@@ -264,9 +345,9 @@ def checkCrash(player, upperPipes, lowerPipes):
             lCollide = pixelCollision(playerRect, lPipeRect, pHitMask, lHitmask)
 
             if uCollide or lCollide:
-                return True
+                return [True,False]
 
-    return False
+    return [False,False]
 
 def pixelCollision(rect1, rect2, hitmask1, hitmask2):
     """Checks if two objects collide and not just their rects"""

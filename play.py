@@ -7,6 +7,10 @@ import skimage as skimage
 import random
 import numpy as np
 import keras
+import datetime
+import time
+import json
+
 
 from keras.models import model_from_json
 from keras.optimizers import SGD , Adam
@@ -15,17 +19,29 @@ from skimage.transform import rotate
 from skimage.viewer import ImageViewer
 from skimage.io import imsave, imread, imshow
 
+
 _ROOTPATH = "/home/galgadot/Documents/Skripsi/FlappyBot/"
 ACTIONS = 2
 
+def loadFromFile():
+    with open('save_data.json', 'r') as fp:
+        data = json.load(fp)
+    return data['hgscore'], data['hgtime']
+
+def saveToFile():
+    pass
 
 def playNetwork(model, sess):
     game_state = game.GameState()
     readytoplay = game_state.showWelcomeAnimation()
+    notDead = True
     if readytoplay:
+        import time
+        skor = 0
+        start = time.time()
         action = np.zeros(ACTIONS)
         action[0] = 1
-        img, reward = game_state.frame_step(action)
+        img, reward, crashinfo = game_state.frame_step(action)
         img = skimage.color.rgb2gray(img)
         img = skimage.transform.resize(img,(80,80))
         img = skimage.exposure.rescale_intensity(img,out_range=(0,255))
@@ -33,28 +49,48 @@ def playNetwork(model, sess):
         stack_img = np.stack((img, img, img, img), axis=2)
         stack_img = stack_img.reshape(1, stack_img.shape[0], stack_img.shape[1], stack_img.shape[2])  #1*80*80*4
         frame = 0
-        for i in range(0,1000):
-        # while (True):
-            reward = 0
-            action_index = 0
-            action = np.zeros([ACTIONS])
-            predict = model.predict(stack_img)
-            result = np.argmax(predict)
-            action_index = result
-            action[result] = 1
-
-            img, reward = game_state.frame_step(action)
-            img = skimage.color.rgb2gray(img)
-            img = skimage.transform.resize(img,(80,80))
-            img = skimage.exposure.rescale_intensity(img, out_range=(0, 255))
-            img = img / 255.0
-            img = img.reshape(1, img.shape[0], img.shape[1], 1)
-            stack = np.append(img, stack_img[:, :, :, :3], axis=3)
-            stack_img = stack
-            frame = frame + 1
-
-            print("Frame", frame,"/ Action", action_index, "/ Reward", reward)
-        print("End")
+        # for i in range(0,1000):
+        while (True):
+            if notDead:
+                reward = 0
+                action_index = 0
+                action = np.zeros([ACTIONS])
+                predict = model.predict(stack_img)
+                result = np.argmax(predict)
+                action_index = result
+                action[result] = 1
+                action = [0,1]
+                actionstatus = "Flap" if action_index == 1 else "Not-Flap"
+                img, reward, crashinfo = game_state.frame_step(action)
+                img = skimage.color.rgb2gray(img)
+                img = skimage.transform.resize(img,(80,80))
+                img = skimage.exposure.rescale_intensity(img, out_range=(0, 255))
+                img = img / 255.0
+                img = img.reshape(1, img.shape[0], img.shape[1], 1)
+                stack = np.append(img, stack_img[:, :, :, :3], axis=3)
+                stack_img = stack
+                frame = frame + 1
+                if reward != -1:
+                    if reward == 1:
+                        skor = skor + reward
+                    print("Hidup | Frame", frame,"/ Action", action_index,"|",actionstatus, "/ Reward", reward)
+                else :
+                    end = time.time()
+                    #print(crashinfo)
+                    print("Mati | Frame", frame, "/ Reward", reward)
+                    notDead = False
+            else :
+                time_taken = int(end - start)
+                timestr = str(datetime.timedelta(seconds=time_taken))
+                crashinfo['timetake'] = timestr
+                print(crashinfo)
+                print("Selesai Dengan Lama Bermain ",timestr, " Dengan Skor ", skor)
+                todo = game_state.showGameOverScreen(crashinfo)
+                if todo:
+                    skor = 0
+                    crashinfo = {}
+                    notDead = True
+                # break
 
 def loadModel():
     json_file = open('saved_networks/saved_model.json', 'r')
