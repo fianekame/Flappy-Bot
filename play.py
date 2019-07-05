@@ -68,7 +68,7 @@ def playNetwork(model, sess):
                 result = np.argmax(predict)
                 action_index = result
                 action[result] = 1
-                action = [0,1]
+                # action = [0,1] todo cek crash info
                 actionstatus = "Flap" if action_index == 1 else "Not-Flap"
                 img, reward, crashinfo = game_state.frame_step(action)
                 img = skimage.color.rgb2gray(img)
