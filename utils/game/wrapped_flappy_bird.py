@@ -14,7 +14,7 @@ SCREENHEIGHT = 512
 pygame.init()
 FPSCLOCK = pygame.time.Clock()
 SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
-pygame.display.set_caption('Flappy Bird')
+pygame.display.set_caption('Flappy Bot | CNN')
 
 IMAGES, SOUNDS, HITMASKS = flappy_bird_utils.load()
 PIPEGAPSIZE = 100 # gap between upper and lower part of pipe
@@ -57,17 +57,65 @@ class GameState:
         self.playerFlapAcc =  -9   # players speed on flapping
         self.playerFlapped = False # True when player flaps
 
+    def showWelcomeAnimation(self):
+        print("masukwelcome")
+        """Shows welcome screen animation of flappy bird"""
+        # index of player to blit on screen
+        playerIndex = 0
+        playerIndexGen = cycle([0, 1, 2, 1])
+        # iterator used to change playerIndex after every 5th iteration
+        loopIter = 0
+
+        playerx = int(SCREENWIDTH * 0.44)
+        playery = int((SCREENHEIGHT - IMAGES['player'][0].get_height()) / 2)
+
+        messagex = int((SCREENWIDTH - IMAGES['message'].get_width()) / 2)
+        messagey = int(SCREENHEIGHT * 0.12)
+
+        basex = 0
+        # amount by which base can maximum shift to left
+        baseShift = IMAGES['base'].get_width() - IMAGES['background'].get_width()
+
+        # player shm for up-down motion on welcome screen
+        playerShmVals = {'val': 0, 'dir': 1}
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                    pygame.quit()
+                    sys.exit()
+                if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+                    # make first flap sound and return values for mainGame
+                    # SOUNDS['wing'].play()
+                    return True
+
+            # adjust playery, playerIndex, basex
+            if (loopIter + 1) % 5 == 0:
+                playerIndex = next(playerIndexGen)
+            loopIter = (loopIter + 1) % 30
+            basex = -((-basex + 4) % baseShift)
+            playerShm(playerShmVals)
+
+            # draw sprites
+            SCREEN.blit(IMAGES['background'], (0,0))
+            SCREEN.blit(IMAGES['player'][playerIndex],
+                        (playerx, playery + playerShmVals['val']))
+            SCREEN.blit(IMAGES['message'], (messagex, messagey))
+            SCREEN.blit(IMAGES['base'], (basex, BASEY))
+
+            pygame.display.update()
+            FPSCLOCK.tick(FPS)
+
     def frame_step(self, input_actions):
         pygame.event.pump()
-
         reward = 0.1
         terminal = False
-
+        # input_actions[0] == 1: do nothing
+        # input_actions[1] == 1: flap the bird
         if sum(input_actions) != 1:
             raise ValueError('Multiple input actions!')
 
-        # input_actions[0] == 1: do nothing
-        # input_actions[1] == 1: flap the bird
+
         if input_actions[1] == 1:
             if self.playery > -2 * PLAYER_HEIGHT:
                 self.playerVelY = self.playerFlapAcc
@@ -133,6 +181,7 @@ class GameState:
             SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
 
         SCREEN.blit(IMAGES['base'], (self.basex, BASEY))
+        # SCREEN.blit(textsurface,(0,0))
         # print score so player overlaps the score
         showScore(self.score)
         SCREEN.blit(IMAGES['player'][self.playerIndex],
@@ -144,6 +193,16 @@ class GameState:
         FPSCLOCK.tick(FPS)
         # print (self.upperPipes[0]['y'] + PIPE_HEIGHT - int(BASEY * 0.2))
         return image_data, reward
+
+
+def playerShm(playerShm):
+    """oscillates the value of playerShm['val'] between 8 and -8"""
+    if abs(playerShm['val']) == 8:
+        playerShm['dir'] *= -1
+    if playerShm['dir'] == 1:
+         playerShm['val'] += 1
+    else:
+        playerShm['val'] -= 1
 
 def getRandomPipe():
     """returns a randomly generated pipe"""

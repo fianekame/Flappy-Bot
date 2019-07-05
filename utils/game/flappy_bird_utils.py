@@ -32,6 +32,10 @@ def load():
 
     # base (ground) sprite
     IMAGES['base'] = pygame.image.load('utils/assets/sprites/base.png').convert_alpha()
+    # game over sprite
+    IMAGES['gameover'] = pygame.image.load('utils/assets/sprites/gameover.png').convert_alpha()
+    # message sprite for welcome screen
+    IMAGES['message'] = pygame.image.load('utils/assets/sprites/message.png').convert_alpha()
 
     # sounds
     if 'win' in sys.platform:

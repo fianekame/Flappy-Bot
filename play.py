@@ -21,39 +21,40 @@ ACTIONS = 2
 
 def playNetwork(model, sess):
     game_state = game.GameState()
-    action = np.zeros(ACTIONS)
-    action[0] = 1
-    img, reward = game_state.frame_step(action)
-    img = skimage.color.rgb2gray(img)
-    img = skimage.transform.resize(img,(80,80))
-    img = skimage.exposure.rescale_intensity(img,out_range=(0,255))
-    img = img / 255.0
-    stack_img = np.stack((img, img, img, img), axis=2)
-    stack_img = stack_img.reshape(1, stack_img.shape[0], stack_img.shape[1], stack_img.shape[2])  #1*80*80*4
-
-    frame = 0
-    for i in range(0,1000):
-    # while (True):
-        reward = 0
-        action_index = 0
-        action = np.zeros([ACTIONS])
-        predict = model.predict(stack_img)
-        result = np.argmax(predict)
-        action_index = result
-        action[result] = 1
-
+    readytoplay = game_state.showWelcomeAnimation()
+    if readytoplay:
+        action = np.zeros(ACTIONS)
+        action[0] = 1
         img, reward = game_state.frame_step(action)
         img = skimage.color.rgb2gray(img)
         img = skimage.transform.resize(img,(80,80))
-        img = skimage.exposure.rescale_intensity(img, out_range=(0, 255))
+        img = skimage.exposure.rescale_intensity(img,out_range=(0,255))
         img = img / 255.0
-        img = img.reshape(1, img.shape[0], img.shape[1], 1)
-        stack = np.append(img, stack_img[:, :, :, :3], axis=3)
-        stack_img = stack
-        frame = frame + 1
+        stack_img = np.stack((img, img, img, img), axis=2)
+        stack_img = stack_img.reshape(1, stack_img.shape[0], stack_img.shape[1], stack_img.shape[2])  #1*80*80*4
+        frame = 0
+        for i in range(0,1000):
+        # while (True):
+            reward = 0
+            action_index = 0
+            action = np.zeros([ACTIONS])
+            predict = model.predict(stack_img)
+            result = np.argmax(predict)
+            action_index = result
+            action[result] = 1
 
-        print("Frame", frame,"/ Action", action_index, "/ Reward", reward)
-    print("End")
+            img, reward = game_state.frame_step(action)
+            img = skimage.color.rgb2gray(img)
+            img = skimage.transform.resize(img,(80,80))
+            img = skimage.exposure.rescale_intensity(img, out_range=(0, 255))
+            img = img / 255.0
+            img = img.reshape(1, img.shape[0], img.shape[1], 1)
+            stack = np.append(img, stack_img[:, :, :, :3], axis=3)
+            stack_img = stack
+            frame = frame + 1
+
+            print("Frame", frame,"/ Action", action_index, "/ Reward", reward)
+        print("End")
 
 def loadModel():
     json_file = open('saved_networks/saved_model.json', 'r')
