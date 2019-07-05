@@ -1,5 +1,5 @@
 # 1248173607
-# Last Commit Sebelum Sidang, 
+# Last Commit Sebelum Sidang,
 import sys
 sys.path.append("utils/game/")
 import wrapped_flappy_bird as game
@@ -92,7 +92,7 @@ def playNetwork(model, sess):
                 timestr = str(datetime.timedelta(seconds=time_taken))
                 crashinfo['timetake'] = timestr
                 crashinfo['hgscore'] = hgscore
-                crashinfo['hgtime'] = hgtime
+                crashinfo['hgtime'] = str(datetime.timedelta(seconds=hgtime))
                 if skor > hgscore:
                     hgscore = skor
                 if time_taken > hgtime:

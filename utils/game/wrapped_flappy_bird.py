@@ -74,7 +74,7 @@ class GameState:
         playery = int((SCREENHEIGHT - IMAGES['player'][0].get_height()) / 2)
 
         messagex = int((SCREENWIDTH - IMAGES['message'].get_width()) / 2)
-        messagey = int(SCREENHEIGHT * 0.12)
+        messagey = int(SCREENHEIGHT * 0.2)
 
         basex = 0
         # amount by which base can maximum shift to left
@@ -265,8 +265,8 @@ class GameState:
             SCREEN.blit(playerSurface, (playerx,playery))
             SCREEN.blit(IMAGES['gameover'], (55, 180))
 
-            textToScreen(SCREEN, 'Time Play : '+timetake , 70, 230, 20, (255, 255, 255))
-            textToScreen(SCREEN, 'High Score : '+str(hgscore)+ ' & Time Play : '+str(hgtime) , 20, 245, 15, (255, 255, 255))
+            textToScreen(SCREEN, 'Time Play : '+timetake , 87, 470, 20, (255, 255, 255))
+            textToScreen(SCREEN, 'High Score : '+str(hgscore)+ ' & Time Play : '+str(hgtime) , 30, 485, 15, (255, 255, 255))
             # playtime = myfont.render('LAMA BERMAIN : '+timetake, True, (255, 255, 255))
             # SCREEN.blit(playtime,(70,230))
             FPSCLOCK.tick(FPS)
