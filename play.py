@@ -28,13 +28,21 @@ def loadFromFile():
         data = json.load(fp)
     return data['hgscore'], data['hgtime']
 
-def saveToFile():
-    pass
+def saveToFile(hgscore,hgtime):
+
+    data =	{
+      "hgscore": hgscore,
+      "hgtime": hgtime,
+      "lastsaved": str(datetime.datetime.now())
+    }
+    with open('save_data.json', 'w') as fp:
+        json.dump(data, fp)
 
 def playNetwork(model, sess):
+    notDead = True
+    hgscore, hgtime = loadFromFile()
     game_state = game.GameState()
     readytoplay = game_state.showWelcomeAnimation()
-    notDead = True
     if readytoplay:
         import time
         skor = 0
@@ -76,21 +84,24 @@ def playNetwork(model, sess):
                     print("Hidup | Frame", frame,"/ Action", action_index,"|",actionstatus, "/ Reward", reward)
                 else :
                     end = time.time()
-                    #print(crashinfo)
                     print("Mati | Frame", frame, "/ Reward", reward)
                     notDead = False
             else :
                 time_taken = int(end - start)
                 timestr = str(datetime.timedelta(seconds=time_taken))
                 crashinfo['timetake'] = timestr
-                print(crashinfo)
-                print("Selesai Dengan Lama Bermain ",timestr, " Dengan Skor ", skor)
+                crashinfo['hgscore'] = hgscore
+                crashinfo['hgtime'] = hgtime
+                if skor > hgscore:
+                    hgscore = skor
+                if time_taken > hgtime:
+                    hgtime = time_taken
+                saveToFile(hgscore,hgtime)
                 todo = game_state.showGameOverScreen(crashinfo)
                 if todo:
                     skor = 0
                     crashinfo = {}
                     notDead = True
-                # break
 
 def loadModel():
     json_file = open('saved_networks/saved_model.json', 'r')

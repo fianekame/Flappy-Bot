@@ -221,6 +221,8 @@ class GameState:
         playerVelRot = 7
         basex = crashInfo['basex']
         timetake = crashInfo['timetake']
+        hgscore = crashInfo['hgscore']
+        hgtime = crashInfo['hgtime']
 
         upperPipes, lowerPipes = crashInfo['upperPipes'], crashInfo['lowerPipes']
         # play hit and die sounds
@@ -263,7 +265,8 @@ class GameState:
             SCREEN.blit(playerSurface, (playerx,playery))
             SCREEN.blit(IMAGES['gameover'], (55, 180))
 
-            textToScreen(SCREEN, 'LAMA BERMAIN : '+timetake , 70, 230, 20, (255, 255, 255))
+            textToScreen(SCREEN, 'Time Play : '+timetake , 70, 230, 20, (255, 255, 255))
+            textToScreen(SCREEN, 'High Score : '+str(hgscore)+ ' & Time Play : '+str(hgtime) , 20, 245, 15, (255, 255, 255))
             # playtime = myfont.render('LAMA BERMAIN : '+timetake, True, (255, 255, 255))
             # SCREEN.blit(playtime,(70,230))
             FPSCLOCK.tick(FPS)
