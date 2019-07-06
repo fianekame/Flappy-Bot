@@ -73,7 +73,7 @@ class GameState:
         playerx = int(SCREENWIDTH * 0.44)
         playery = int((SCREENHEIGHT - IMAGES['player'][0].get_height()) / 2)
 
-        messagex = int((SCREENWIDTH - IMAGES['message'].get_width()) / 2)
+        messagex = int((SCREENWIDTH - IMAGES['message'].get_width()-3) / 2)
         messagey = int(SCREENHEIGHT * 0.2)
 
         basex = 0
