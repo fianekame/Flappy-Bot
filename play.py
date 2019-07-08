@@ -1,5 +1,3 @@
-# 1248173607
-# Last Commit Sebelum Sidang,
 import sys
 sys.path.append("utils/game/")
 import wrapped_flappy_bird as game
